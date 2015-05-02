@@ -1,0 +1,89 @@
+apply plugin: 'java'
+
+group               = 'testgrp'
+version             = '0.1.0-SNAPSHOT'
+status              = 'integration'
+description         = 'TODO - Pls. edit - Gradle bootstrap project for Comsat'
+
+ext.containerPort   = 8080
+
+ext.classifier      = ':jdk8' // ''
+sourceCompatibility = 1.8     // 1.7
+targetCompatibility = 1.8     // 1.7
+
+ext.slf4jApiVer     = '1.7.12'
+ext.servletVer      = '3.0.1'
+ext.comsatVer       = '0.4.0-SNAPSHOT'
+ext.quasarVer       = '0.6.3-SNAPSHOT'
+ext.junitVer        = '4.12'
+
+[compileJava, compileTestJava]*.options*.encoding = 'UTF-8'
+
+configurations {
+    quasar
+    provided
+}
+
+sourceSets {
+    main.compileClasspath = main.compileClasspath + configurations.provided
+    test.compileClasspath = test.compileClasspath + configurations.provided
+    test.runtimeClasspath = test.runtimeClasspath + configurations.provided
+}
+
+configurations.all {
+    resolutionStrategy {
+        failOnVersionConflict()
+
+        force "org.slf4j:slf4j-api:$slf4jApiVer"
+    }
+}
+
+repositories {
+    mavenLocal()
+    mavenCentral()
+//    maven { url "https://oss.sonatype.org/content/repositories/releases" }
+//    maven { url 'https://oss.sonatype.org/content/repositories/snapshots' }
+//    maven { url 'https://maven.java.net/content/repositories/snapshots' }
+}
+
+test {
+    beforeTest { desc ->
+        logger.quiet("Running test: " + desc)
+    }
+
+    afterTest { desc, result ->
+        if(result.resultType == TestResult.ResultType.FAILURE) {
+            logger.quiet("Failed test ${desc.name} [${desc.className}] with exception: ${result.exception}")
+            if(result.exception != null) {
+                result.exception.printStackTrace()
+            }
+        }
+    }
+}
+
+dependencies {
+    compile "co.paralleluniverse:comsat-actors-api:$comsatVer"
+    compile "co.paralleluniverse:comsat-actors-servlet:$comsatVer"
+    compile "co.paralleluniverse:comsat-test-utils:$comsatVer"
+    compile "org.slf4j:slf4j-api:$slf4jApiVer"
+
+    provided "javax.servlet:javax.servlet-api:$servletVer"
+
+    quasar "co.paralleluniverse:quasar-core:${quasarVer}${classifier}@jar"
+
+    testCompile "junit:junit:$junitVer"
+}
+
+task wrapper(type: Wrapper) {
+    gradleVersion = '2.3'
+}
+
+defaultTasks 'compile'
+
+apply plugin: 'application'
+
+mainClassName = "${group}.embedded.Main"
+applicationDefaultJvmArgs = [
+        "-javaagent:${configurations.quasar.singleFile}",
+        "-Dco.paralleluniverse.fibers.verifyInstrumentation=true"
+]
