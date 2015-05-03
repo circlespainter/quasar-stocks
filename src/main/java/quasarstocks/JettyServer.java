@@ -1,4 +1,4 @@
-package testgrp.embedded;
+package quasarstocks;
 
 import co.paralleluniverse.embedded.containers.AbstractEmbeddedServer;
 import org.eclipse.jetty.server.Server;

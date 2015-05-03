@@ -1,4 +1,4 @@
-package testgrp.embedded;
+package quasarstocks;
 
 import org.eclipse.jetty.servlet.DefaultServlet;
 

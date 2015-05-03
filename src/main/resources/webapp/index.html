@@ -1,6 +1,29 @@
+<!DOCTYPE html>
 <html>
-<head></head>
-<body>
-<h1>Hello!</h1>
+<head>
+    <title>Quasar Stock News Dashboard</title>
+    <link rel='stylesheet' href='/assets/lib/bootstrap/css/bootstrap.min.css'>
+    <link rel="stylesheet" media="screen" href="/assets/stylesheets/main.css">
+    <link rel="shortcut icon" type="image/png" href="/assets/images/favicon.ico">
+    <script type='text/javascript' src='/assets/lib/jquery/jquery.js'></script>
+    <script type='text/javascript' src='/assets/lib/flot/jquery.flot.js'></script>
+    <script type='text/javascript' src='/assets/javascripts/index.js'></script>
+</head>
+<body data-http-url="http://localhost:8080/ws" data-ws-url="ws://localhost:8080/ws">
+<div class="navbar navbar-inverse navbar-fixed-top">
+    <div class="navbar-inner">
+        <div class="container">
+            <a class="brand" href="#">Quasar Stocks</a>
+            <form id="addsymbolform" class="navbar-form pull-right">
+                <input id="addsymboltext" type="text" class="span2" placeholder="SYMBOL">
+                <button type="submit" class="btn">Add Stock</button>
+            </form>
+        </div>
+    </div>
+</div>
+
+<div id="stocks" class="container">
+
+</div>
 </body>
 </html>

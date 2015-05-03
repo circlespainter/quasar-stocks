@@ -1,20 +1,18 @@
 apply plugin: 'java'
 
-group               = 'testgrp'
 version             = '0.1.0-SNAPSHOT'
 status              = 'integration'
-description         = 'TODO - Pls. edit - Gradle bootstrap project for Comsat'
-
-ext.containerPort   = 8080
+description         = 'Quasar WebActors StockActors'
 
 ext.classifier      = ':jdk8' // ''
 sourceCompatibility = 1.8     // 1.7
 targetCompatibility = 1.8     // 1.7
 
-ext.slf4jApiVer     = '1.7.12'
+ext.slf4jVer        = '1.7.12'
 ext.servletVer      = '3.0.1'
 ext.comsatVer       = '0.4.0-SNAPSHOT'
 ext.quasarVer       = '0.6.3-SNAPSHOT'
+ext.jacksonVer      = '2.5.0'
 ext.junitVer        = '4.12'
 
 [compileJava, compileTestJava]*.options*.encoding = 'UTF-8'
@@ -34,7 +32,7 @@ configurations.all {
     resolutionStrategy {
         failOnVersionConflict()
 
-        force "org.slf4j:slf4j-api:$slf4jApiVer"
+        force "org.slf4j:slf4j-api:$slf4jVer"
     }
 }
 
@@ -65,11 +63,14 @@ dependencies {
     compile "co.paralleluniverse:comsat-actors-api:$comsatVer"
     compile "co.paralleluniverse:comsat-actors-servlet:$comsatVer"
     compile "co.paralleluniverse:comsat-test-utils:$comsatVer"
-    compile "org.slf4j:slf4j-api:$slf4jApiVer"
+    compile "org.slf4j:slf4j-api:$slf4jVer"
+    compile "com.fasterxml.jackson.core:jackson-databind:$jacksonVer"
 
     provided "javax.servlet:javax.servlet-api:$servletVer"
 
     quasar "co.paralleluniverse:quasar-core:${quasarVer}${classifier}@jar"
+
+    runtime "org.slf4j:slf4j-simple:$slf4jVer"
 
     testCompile "junit:junit:$junitVer"
 }
@@ -82,8 +83,8 @@ defaultTasks 'compile'
 
 apply plugin: 'application'
 
-mainClassName = "${group}.embedded.Main"
+mainClassName = "quasarstocks.Application"
 applicationDefaultJvmArgs = [
-        "-javaagent:${configurations.quasar.singleFile}",
-        "-Dco.paralleluniverse.fibers.verifyInstrumentation=true"
+    "-javaagent:${configurations.quasar.singleFile}",
+    "-Dco.paralleluniverse.fibers.verifyInstrumentation=true"
 ]
