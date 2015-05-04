@@ -1,18 +1,12 @@
 package quasarstocks;
 
+import java.util.List;
 import co.paralleluniverse.actors.ActorRef;
 
-import java.util.List;
-
-/**
- * @author circlespainter
- */
 public final class StockCmds {
-    public interface StockCommand {}
+    public final static Object FetchLatest = new Object();
 
-    public final static StockCommand FetchLatest = new StockCommand(){};
-
-    public final static class StockUpdate implements StockCommand {
+    public final static class StockUpdate {
         public final String symbol;
         public final Number price;
         public StockUpdate(final String symbol, final Number price) {
@@ -21,7 +15,7 @@ public final class StockCmds {
         }
     }
 
-    public final static class StockHistory implements StockCommand {
+    public final static class StockHistory {
         public final String symbol;
         public final List<Double> history;
         public StockHistory(final String symbol, final List<Double> history) {
@@ -30,7 +24,7 @@ public final class StockCmds {
         }
     }
 
-    public final static class WatchStock implements StockCommand {
+    public final static class WatchStock {
         public final String symbol;
         public final ActorRef sender;
         public WatchStock(final String symbol, final ActorRef sender) {
@@ -39,7 +33,7 @@ public final class StockCmds {
         }
     }
 
-    public final static class UnwatchStock implements StockCommand {
+    public final static class UnwatchStock {
         public final String symbol;
         public final ActorRef sender;
         public UnwatchStock(final String symbol, final ActorRef sender) {
