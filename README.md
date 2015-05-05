@@ -22,7 +22,6 @@ This is a porting of [TypeSafe's Reactive Stock](https://github.com/typesafehub/
 
 ## TODO
 
-- Add `comsat-jersey`-based sentiment WS proxies (but they don't seem to work in the original sample either).
 - Currently generated web resources are just copied: add build steps from original CoffeeScript and LESS source files.
 - Do away with the `comsat-testutils` dep.
 - Add [Capsule](https://github.com/puniverse/capsule)-based deployment.
