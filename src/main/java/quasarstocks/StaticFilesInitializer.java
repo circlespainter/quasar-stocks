@@ -1,9 +1,6 @@
 package quasarstocks;
 
-import javax.servlet.ServletContext;
-import javax.servlet.ServletContextEvent;
-import javax.servlet.ServletContextListener;
-import javax.servlet.ServletRegistration;
+import javax.servlet.*;
 import javax.servlet.annotation.WebListener;
 import org.eclipse.jetty.servlet.DefaultServlet;
 
