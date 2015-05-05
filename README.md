@@ -5,7 +5,7 @@ This is a porting of [TypeSafe's Reactive Stock](https://github.com/typesafehub/
 ## Getting started
 
 1. `./gradlew run`
-2. Open http://localhost:8080 in a browser that supports WebSocket.
+2. Open http://localhost:8080 in Firefox.
 3. Add new (fake) stock symbols.
 
 ## Notes
