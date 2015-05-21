@@ -4,9 +4,10 @@ This is a porting of [TypeSafe's Reactive Stock](https://github.com/typesafehub/
 
 ## Getting started
 
-1. `./gradlew run`
-2. Open http://localhost:8080 in Firefox.
-3. Add new (fake) stock symbols.
+1. It depends on yet unreleased `comsat-test-utils` 0.4.0, so clone http://github.com/puniverse/comsat and `./gradle install` it.
+2. `./gradlew run`.
+3. Open http://localhost:8080 in Firefox.
+4. Play with it.
 
 ## Notes
 
