@@ -11,13 +11,13 @@ targetCompatibility = 1.8     // 1.7
 ext.slf4jVer        = '1.7.12'
 ext.servletVer      = '3.0.1'
 ext.comsatVer       = '0.4.0-SNAPSHOT'
-ext.quasarVer       = '0.6.3-SNAPSHOT'
+ext.quasarVer       = '0.7.1-SNAPSHOT'
 ext.jacksonVer      = '2.3.3'
 ext.junitVer        = '4.12'
-ext.asmVer          = '5.0.3'
-ext.jerseyVer       = '2.17'
-ext.httpClientVer   = '4.3.6'
-ext.httpCoreVer     = '4.3.3'
+ext.asmVer          = '5.0.4'
+ext.jerseyVer       = '2.18'
+ext.httpClientVer   = '4.5'
+ext.httpCoreVer     = '4.4.1'
 
 [compileJava, compileTestJava]*.options*.encoding = 'UTF-8'
 
