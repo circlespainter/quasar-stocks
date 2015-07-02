@@ -1,2 +1,1 @@
 - Why an HTTP GET is needed before establishing a WebSocket connection?
-- It would be nice to have a (snapshotted/immutable?) `SupervisorActor.getChildren()` method.
