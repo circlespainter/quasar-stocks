@@ -4,8 +4,10 @@
 <meta charset="utf-8"/>
 <title>WebSocket Test</title>
 <script language="javascript" type="text/javascript">
-  var wsHttpUri = "http://localhost:8080/ws";
-  var wsUri = "ws://localhost:8080/ws";
+  var hostname = window.location.hostname;
+
+  var wsHttpUri = "http://" + hostname + ":8080/ws";
+  var wsUri = "ws://" + hostname + ":8080/ws";
   var output;
 
   function init()

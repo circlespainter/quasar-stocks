@@ -2,8 +2,8 @@
   var getAxisMax, getAxisMin, getChartArray, getChartOptions, getPricesFromArray, handleFlip, populateStockHistory, updateStockChart;
 
   $(function() {
-    var httpUri = $("body").data("http-url");
-    var wsUri = $("body").data("ws-url");
+    var httpUri = $("body").data("http-scheme") + window.location.hostname + ":" + window.location.port + $("body").data("http-path");
+    var wsUri = $("body").data("ws-scheme") + window.location.hostname + ":" + window.location.port + $("body").data("ws-path");
 
     xmlHttp = new XMLHttpRequest();
     xmlHttp.open( "GET", httpUri, false );
