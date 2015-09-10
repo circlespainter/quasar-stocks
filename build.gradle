@@ -1,5 +1,9 @@
 apply plugin: 'java'
 
+apply plugin: 'application'
+
+mainClassName = "quasarstocks.Application"
+
 version             = '0.1.0-SNAPSHOT'
 status              = 'integration'
 description         = 'Quasar WebActors StockActors'
@@ -19,11 +23,15 @@ ext.jerseyVer       = '2.18'
 ext.httpClientVer   = '4.5'
 ext.httpCoreVer     = '4.4.1'
 
+ext.capsuleVersion  = '1.0-rc2-SNAPSHOT'
+
 [compileJava, compileTestJava]*.options*.encoding = 'UTF-8'
 
 configurations {
     quasar
     provided
+	capsule
+	capsuleMaven
 }
 
 sourceSets {
@@ -94,19 +102,76 @@ dependencies {
 
     runtime "org.slf4j:slf4j-simple:$slf4jVer"
 
-    testCompile "junit:junit:$junitVer"
+	capsule "co.paralleluniverse:capsule:$capsuleVersion"
+	capsuleMaven "co.paralleluniverse:capsule-maven:$capsuleVersion"
+
+	testCompile "junit:junit:$junitVer"
 }
 
-task wrapper(type: Wrapper) {
-    gradleVersion = '2.3'
+def getDependencies(config) {
+	return config.getAllDependencies().collect {
+		def res = it.group + ':' + it.name + ':' + it.version + (!it.artifacts.isEmpty() ? ':' + it.artifacts.iterator().next().classifier : '')
+		if(!it.excludeRules.isEmpty()) {
+			res += "(" + it.excludeRules.collect { it.group + ':' + it.module }.join(',') + ")"
+		}
+		return res
+	}
 }
 
-defaultTasks 'compile'
+task capsule(type: Jar, dependsOn: classes) {
+    archiveName = "quasar-stocks-thin.jar"
 
-apply plugin: 'application'
+    from sourceSets.main.output // this way we don't need to extract
 
-mainClassName = "quasarstocks.Application"
+    from { configurations.capsule.collect { zipTree(it) } } // we need all of Capsule's classes
+    from { configurations.capsuleMaven.collect { zipTree(it) } } // we need all of Capsule's classes
+
+    manifest {
+        attributes (
+            'Premain-Class'     : 'Capsule',
+            'Main-Class'        : 'Capsule',
+            'Application-Class' : mainClassName,
+            'Application-Version' : version,
+            'Extract-Capsule'   : 'false', // don't extract capsule to the filesystem
+            'Min-Java-Version'  : '1.8.0',
+            'JVM-Args'          : run.jvmArgs.join(' '),
+            'System-Properties' : run.systemProperties.collect { k,v -> "$k=$v" }.join(' '),
+            'Java-Agents'       : getDependencies(configurations.quasar).iterator().next(),
+            'Dependencies'      : getDependencies(configurations.runtime).join(' '),
+            'Repositories'      : 'central https://oss.sonatype.org/content/repositories/snapshots',
+
+            'Caplets'           : 'MavenCapsule'
+        )
+    }
+}
+
+task fatCapsule(type: Jar, dependsOn: jar) {
+    archiveName = "quasar-stocks-fat.jar"
+
+    from jar // embed our application jar
+    from { configurations.runtime } // embed dependencies
+
+    from 'log4j.xml'
+
+    from(configurations.capsule.collect { zipTree(it) }) { include 'Capsule.class' } // we just need the single Capsule class
+
+    manifest {
+        attributes (
+            'Premain-Class'     : 'Capsule',
+            'Main-Class'        : 'Capsule',
+            'Application-Class' : mainClassName,
+            'Application-Version' : version,
+            'Min-Java-Version'  : '1.8.0',
+            'JVM-Args'          : run.jvmArgs.join(' '),
+            'System-Properties' : run.systemProperties.collect { k,v -> "$k=$v" }.join(' '),
+            'Java-Agents'       : getDependencies(configurations.quasar).iterator().next(),
+        )
+    }
+}
+
 applicationDefaultJvmArgs = [
-    "-javaagent:${configurations.quasar.singleFile}",
-    "-Dco.paralleluniverse.fibers.verifyInstrumentation=true"
+	"-javaagent:${configurations.quasar.singleFile}",
+	"-Dco.paralleluniverse.fibers.verifyInstrumentation=true"
 ]
+
+defaultTasks 'capsule'
