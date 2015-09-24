@@ -1,7 +1,6 @@
 package quasarstocks;
 
 import co.paralleluniverse.comsat.webactors.servlet.WebActorInitializer;
-import co.paralleluniverse.embedded.containers.JettyServer;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 public class Application {
@@ -13,7 +12,7 @@ public class Application {
     }
 
     public static void main(String[] args) throws Exception {
-        JettyServer embeddedServer = new JettyServer();
+        final CustomJettyServer embeddedServer = new CustomJettyServer();
         WebActorInitializer.setUserClassLoader(ClassLoader.getSystemClassLoader());
         embeddedServer.addServletContextListener(JerseyInitializer.class);
         embeddedServer.addServletContextListener(WebActorInitializer.class);
