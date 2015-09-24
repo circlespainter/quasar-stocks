@@ -26,6 +26,7 @@ ext.jerseyVer       = '2.19'
 
 ext.capsuleVersion  = '1.0.1-SNAPSHOT'
 ext.capsuleMavenVersion  = '1.0'
+ext.capsuleShieldVersion  = '0.2.0-SNAPSHOT'
 
 [compileJava, compileTestJava]*.options*.encoding = 'UTF-8'
 
@@ -34,6 +35,7 @@ configurations {
     provided
 	capsule
 	capsuleMaven
+    capsuleShield
 }
 
 sourceSets {
@@ -107,6 +109,7 @@ dependencies {
 
 	capsule "co.paralleluniverse:capsule:$capsuleVersion"
 	capsuleMaven "co.paralleluniverse:capsule-maven:$capsuleMavenVersion"
+    capsuleShield "co.paralleluniverse:capsule-shield:$capsuleShieldVersion"
 
 	testCompile "junit:junit:$junitVer"
 }
@@ -168,6 +171,59 @@ task fatCapsule(type: Jar, dependsOn: jar) {
             'JVM-Args'          : run.jvmArgs.join(' '),
             'System-Properties' : run.systemProperties.collect { k,v -> "$k=$v" }.join(' '),
             'Java-Agents'       : getDependencies(configurations.quasar).iterator().next(),
+        )
+    }
+}
+
+task shieldCapsule(type: Jar, dependsOn: classes) {
+    archiveName = "photon.jar"
+    from sourceSets.main.output // this way we don't need to extract
+
+    from { configurations.capsule.collect { zipTree(it) } } // we need all of Capsule's classes
+    from { configurations.capsuleMaven.collect { zipTree(it) } } // we need all of Capsule's classes
+    from { configurations.capsuleShield.collect { zipTree(it) } } // we need all of Capsule's classes
+
+    manifest {
+        attributes (
+            'Premain-Class'     : 'Capsule',
+            'Main-Class'        : 'Capsule',
+            'Application-Class' : mainClassName,
+            'Application-Version' : version,
+            'Extract-Capsule'   : 'false', // don't extract capsule to the filesystem
+            'Min-Java-Version'  : '1.8.0',
+            'JVM-Args'          : run.jvmArgs.join(' '),
+            'System-Properties' : run.systemProperties.collect { k,v -> "$k=$v" }.join(' '),
+            'Java-Agents'       : getDependencies(configurations.quasar).iterator().next(),
+            'Dependencies'      : getDependencies(configurations.runtime).join(' '),
+            'Repositories'      : 'central https://oss.sonatype.org/content/repositories/snapshots',
+
+            'Caplets'           : 'MavenCapsule ShieldedCapsule'
+        )
+    }
+}
+
+task shieldFatCapsule(type: Jar, dependsOn: jar) {
+    archiveName = "photon.jar"
+
+    from jar // embed our application jar
+    from { configurations.runtime } // embed dependencies
+
+    from(configurations.capsule.collect { zipTree(it) }) { include 'Capsule.class' }
+    // we just need the single Capsule class
+    from { configurations.capsuleShield.collect { zipTree(it) } } // we need all of Capsule's classes
+
+    manifest {
+        attributes(
+            'Premain-Class': 'Capsule',
+            'Main-Class': 'Capsule',
+            'Application-Class': mainClassName,
+            'Application-Version': version,
+            'Min-Java-Version': '1.8.0',
+            'JVM-Args': run.jvmArgs.join(' '),
+            'System-Properties': run.systemProperties.collect { k, v -> "$k=$v" }.join(' '),
+            'Java-Agents': getDependencies(configurations.quasar).iterator().next(),
+
+            'Caplets': 'ShieldedCapsule'
         )
     }
 }
