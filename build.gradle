@@ -22,6 +22,7 @@ ext.asmVer          = '5.0.4'
 ext.jerseyVer       = '2.18'
 ext.httpClientVer   = '4.5'
 ext.httpCoreVer     = '4.4.1'
+ext.jerseyVer       = '2.19'
 
 ext.capsuleVersion  = '1.0-rc2-SNAPSHOT'
 
@@ -49,6 +50,7 @@ configurations.all {
         force "com.fasterxml.jackson.core:jackson-annotations:$jacksonVer"
         force "com.fasterxml.jackson.jaxrs:jackson-jaxrs-base:$jacksonVer"
         force "com.fasterxml.jackson.jaxrs:jackson-jaxrs-json-provider:$jacksonVer"
+        force "org.glassfish.jersey.core:jersey-common:$jerseyVer"
         force "org.apache.httpcomponents:httpclient:$httpClientVer"
         force "org.apache.httpcomponents:httpcore:$httpCoreVer"
         force "org.slf4j:slf4j-api:$slf4jVer"
