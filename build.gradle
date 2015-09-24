@@ -14,9 +14,9 @@ targetCompatibility = 1.8     // 1.7
 
 ext.slf4jVer        = '1.7.12'
 ext.servletVer      = '3.0.1'
-ext.comsatVer       = '0.4.0'
-ext.quasarVer       = '0.7.2'
-ext.jacksonVer      = '2.3.3'
+ext.comsatVer       = '0.5.0'
+ext.quasarVer       = '0.7.3'
+ext.jacksonVer      = '2.5.4'
 ext.junitVer        = '4.12'
 ext.asmVer          = '5.0.4'
 ext.jerseyVer       = '2.18'
