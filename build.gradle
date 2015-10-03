@@ -182,7 +182,7 @@ task fatCapsule(type: Jar, dependsOn: jar) {
 }
 
 task shieldCapsule(type: Jar, dependsOn: classes) {
-    archiveName = "photon.jar"
+    archiveName = "quasar-stocks-shield-thin.jar"
     from sourceSets.main.output // this way we don't need to extract
 
     from { configurations.capsule.collect { zipTree(it) } } // we need all of Capsule's classes
@@ -211,7 +211,7 @@ task shieldCapsule(type: Jar, dependsOn: classes) {
 }
 
 task shieldFatCapsule(type: Jar, dependsOn: jar) {
-    archiveName = "photon.jar"
+    archiveName = "quasar-stocks-shield-fat.jar"
 
     from jar // embed our application jar
     from { configurations.runtime } // embed dependencies
