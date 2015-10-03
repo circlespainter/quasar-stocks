@@ -238,6 +238,34 @@ task shieldFatCapsule(type: Jar, dependsOn: jar) {
     }
 }
 
+task shieldFatEmbeddedCapsule(type: Jar, dependsOn: jar) {
+    archiveName = "quasar-stocks-shield-fat-embedded.jar"
+
+    from jar // embed our application jar
+    from { configurations.runtime } // embed dependencies
+
+    from(configurations.capsule.collect { zipTree(it) }) { include 'Capsule.class' }
+    // we just need the single Capsule class
+    from { configurations.capsuleShield.iterator().next() }
+
+    from 'log4j.xml'
+
+    manifest {
+        attributes(
+            'Premain-Class': 'Capsule',
+            'Main-Class': 'Capsule',
+            'Application-Class': mainClassName,
+            'Application-Version': version,
+            'Min-Java-Version': '1.8.0',
+            'JVM-Args': run.jvmArgs.join(' '),
+            'System-Properties': run.systemProperties.collect { k, v -> "$k=$v" }.join(' '),
+            'Java-Agents': getDependencies(configurations.quasar).iterator().next(),
+
+            'Caplets': 'co.paralleluniverse:capsule-shield:0.2.0-SNAPSHOT'
+        )
+    }
+}
+
 applicationDefaultJvmArgs = [
 	"-javaagent:${configurations.quasar.singleFile}",
 	"-Dco.paralleluniverse.fibers.verifyInstrumentation=true"
