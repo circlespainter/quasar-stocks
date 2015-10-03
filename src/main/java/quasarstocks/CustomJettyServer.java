@@ -9,12 +9,16 @@ import org.eclipse.jetty.servlet.ServletHolder;
 import org.eclipse.jetty.util.log.Log;
 import org.eclipse.jetty.util.thread.QueuedThreadPool;
 import org.eclipse.jetty.websocket.jsr356.server.deploy.WebSocketServerContainerInitializer;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.servlet.Servlet;
 import javax.servlet.ServletContextListener;
 import java.lang.management.ManagementFactory;
 
 public class CustomJettyServer extends AbstractEmbeddedServer {
+	private static final Logger log = LoggerFactory.getLogger(CustomJettyServer.class);
+
 	private Server server;
 	private ServerConnector http;
 	private ServletContextHandler context;
@@ -68,6 +72,8 @@ public class CustomJettyServer extends AbstractEmbeddedServer {
 		if (wsEnabled)
 			WebSocketServerContainerInitializer.configureContext(context);
 		server.start();
+
+		log.info("Jetty server started");
 	}
 
 	@Override

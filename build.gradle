@@ -13,6 +13,7 @@ sourceCompatibility = 1.8     // 1.7
 targetCompatibility = 1.8     // 1.7
 
 ext.slf4jVer        = '1.7.12'
+ext.log4jVer        = '1.2.17'
 ext.servletVer      = '3.0.1'
 ext.comsatVer       = '0.5.0'
 ext.quasarVer       = '0.7.3'
@@ -107,7 +108,8 @@ dependencies {
 
     quasar "co.paralleluniverse:quasar-core:${quasarVer}${classifier}@jar"
 
-    runtime "org.slf4j:slf4j-simple:$slf4jVer"
+    runtime "log4j:log4j:$log4jVer"
+    runtime "org.slf4j:slf4j-log4j12:$slf4jVer"
 
 	capsule "co.paralleluniverse:capsule:$capsuleVersion"
 	capsuleMaven "co.paralleluniverse:capsule-maven:$capsuleMavenVersion"
@@ -134,6 +136,8 @@ task capsule(type: Jar, dependsOn: classes) {
     from { configurations.capsule.collect { zipTree(it) } } // we need all of Capsule's classes
     from { configurations.capsuleMaven.collect { zipTree(it) } } // we need all of Capsule's classes
 
+    from 'log4j.xml'
+
     manifest {
         attributes (
             'Premain-Class'     : 'Capsule',
@@ -159,9 +163,9 @@ task fatCapsule(type: Jar, dependsOn: jar) {
     from jar // embed our application jar
     from { configurations.runtime } // embed dependencies
 
-    from 'log4j.xml'
-
     from(configurations.capsule.collect { zipTree(it) }) { include 'Capsule.class' } // we just need the single Capsule class
+
+    from 'log4j.xml'
 
     manifest {
         attributes (
@@ -184,6 +188,8 @@ task shieldCapsule(type: Jar, dependsOn: classes) {
     from { configurations.capsule.collect { zipTree(it) } } // we need all of Capsule's classes
     from { configurations.capsuleMaven.collect { zipTree(it) } } // we need all of Capsule's classes
     from { configurations.capsuleShield.collect { zipTree(it) } } // we need all of Capsule's classes
+
+    from 'log4j.xml'
 
     manifest {
         attributes (
@@ -213,6 +219,8 @@ task shieldFatCapsule(type: Jar, dependsOn: jar) {
     from(configurations.capsule.collect { zipTree(it) }) { include 'Capsule.class' }
     // we just need the single Capsule class
     from { configurations.capsuleShield.collect { zipTree(it) } } // we need all of Capsule's classes
+
+    from 'log4j.xml'
 
     manifest {
         attributes(
