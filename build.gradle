@@ -136,7 +136,7 @@ task capsule(type: Jar, dependsOn: classes) {
     from { configurations.capsule.collect { zipTree(it) } } // we need all of Capsule's classes
     from { configurations.capsuleMaven.collect { zipTree(it) } } // we need all of Capsule's classes
 
-    from 'log4j.xml'
+    from 'log4j.properties'
 
     manifest {
         attributes (
@@ -165,7 +165,7 @@ task fatCapsule(type: Jar, dependsOn: jar) {
 
     from(configurations.capsule.collect { zipTree(it) }) { include 'Capsule.class' } // we just need the single Capsule class
 
-    from 'log4j.xml'
+    from 'log4j.properties'
 
     manifest {
         attributes (
@@ -189,7 +189,7 @@ task shieldCapsule(type: Jar, dependsOn: classes) {
     from { configurations.capsuleMaven.collect { zipTree(it) } } // we need all of Capsule's classes
     from { configurations.capsuleShield.collect { zipTree(it) } } // we need all of Capsule's classes
 
-    from 'log4j.xml'
+    from 'log4j.properties'
 
     manifest {
         attributes (
@@ -220,7 +220,7 @@ task shieldFatCapsule(type: Jar, dependsOn: jar) {
     // we just need the single Capsule class
     from { configurations.capsuleShield.collect { zipTree(it) } } // we need all of Capsule's classes
 
-    from 'log4j.xml'
+    from 'log4j.properties'
 
     manifest {
         attributes(
@@ -248,7 +248,7 @@ task shieldFatEmbeddedCapsule(type: Jar, dependsOn: jar) {
     // we just need the single Capsule class
     from { configurations.capsuleShield.iterator().next() }
 
-    from 'log4j.xml'
+    from 'log4j.properties'
 
     manifest {
         attributes(
