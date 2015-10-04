@@ -34,8 +34,8 @@ ext.capsuleShieldVersion  = '0.2.0-SNAPSHOT'
 configurations {
     quasar
     provided
-	capsule
-	capsuleMaven
+    capsule
+    capsuleMaven
     capsuleShield
 }
 
@@ -100,20 +100,19 @@ dependencies {
 
     compile "org.eclipse.jetty:jetty-jmx:9.2.13.v20150730"
 
-    compile "org.slf4j:slf4j-api:$slf4jVer"
+    compile 'org.apache.logging.log4j:log4j-api:2.4'
 
     compile "com.fasterxml.jackson.core:jackson-databind:$jacksonVer"
 
     provided "javax.servlet:javax.servlet-api:$servletVer"
 
+    capsule "co.paralleluniverse:capsule:$capsuleVersion"
+    capsuleMaven "co.paralleluniverse:capsule-maven:$capsuleMavenVersion"
+    capsuleShield "co.paralleluniverse:capsule-shield:$capsuleShieldVersion"
+
     quasar "co.paralleluniverse:quasar-core:${quasarVer}${classifier}@jar"
 
-    runtime "log4j:log4j:$log4jVer"
-    runtime "org.slf4j:slf4j-log4j12:$slf4jVer"
-
-	capsule "co.paralleluniverse:capsule:$capsuleVersion"
-	capsuleMaven "co.paralleluniverse:capsule-maven:$capsuleMavenVersion"
-    capsuleShield "co.paralleluniverse:capsule-shield:$capsuleShieldVersion"
+    runtime 'org.apache.logging.log4j:log4j-core:2.4'
 
 	testCompile "junit:junit:$junitVer"
 }
@@ -128,13 +127,13 @@ def getDependencies(config) {
 	}
 }
 
-task capsule(type: Jar, dependsOn: classes) {
+task thinCapsule(type: Jar, dependsOn: classes) {
     archiveName = "quasar-stocks-thin.jar"
 
     from sourceSets.main.output // this way we don't need to extract
 
     from { configurations.capsule.collect { zipTree(it) } } // we need all of Capsule's classes
-    from { configurations.capsuleMaven.collect { zipTree(it) } } // we need all of Capsule's classes
+    from { configurations.capsuleMaven.collect { zipTree(it) } } // we need all of Capsule Maven's classes
 
     from 'log4j.properties'
 
@@ -161,6 +160,7 @@ task fatCapsule(type: Jar, dependsOn: jar) {
     archiveName = "quasar-stocks-fat.jar"
 
     from jar // embed our application jar
+
     from { configurations.runtime } // embed dependencies
 
     from(configurations.capsule.collect { zipTree(it) }) { include 'Capsule.class' } // we just need the single Capsule class
@@ -181,13 +181,14 @@ task fatCapsule(type: Jar, dependsOn: jar) {
     }
 }
 
-task shieldCapsule(type: Jar, dependsOn: classes) {
-    archiveName = "quasar-stocks-shield-thin.jar"
+task shieldExplodedThinCapsule(type: Jar, dependsOn: classes) {
+    archiveName = "quasar-stocks-shield-exploded-thin.jar"
+
     from sourceSets.main.output // this way we don't need to extract
 
     from { configurations.capsule.collect { zipTree(it) } } // we need all of Capsule's classes
     from { configurations.capsuleMaven.collect { zipTree(it) } } // we need all of Capsule's classes
-    from { configurations.capsuleShield.collect { zipTree(it) } } // we need all of Capsule's classes
+    from { configurations.capsuleShield.collect { zipTree(it) } } // we need all of Capsule Shield's classes
 
     from 'log4j.properties'
 
@@ -210,20 +211,19 @@ task shieldCapsule(type: Jar, dependsOn: classes) {
     }
 }
 
-task shieldFatCapsule(type: Jar, dependsOn: jar) {
-    archiveName = "quasar-stocks-shield-fat.jar"
+task shieldExplodedFatCapsule(type: Jar, dependsOn: jar) {
+    archiveName = "quasar-stocks-shield-exploded-fat.jar"
 
     from jar // embed our application jar
     from { configurations.runtime } // embed dependencies
 
-    from(configurations.capsule.collect { zipTree(it) }) { include 'Capsule.class' }
-    // we just need the single Capsule class
-    from { configurations.capsuleShield.collect { zipTree(it) } } // we need all of Capsule's classes
+    from(configurations.capsule.collect { zipTree(it) }) { include 'Capsule.class' } // we just need the single Capsule class
+    from { configurations.capsuleShield.collect { zipTree(it) } } // we need all of Capsule Shield's classes
 
     from 'log4j.properties'
 
     manifest {
-        attributes(
+        attributes (
             'Premain-Class': 'Capsule',
             'Main-Class': 'Capsule',
             'Application-Class': mainClassName,
@@ -238,20 +238,49 @@ task shieldFatCapsule(type: Jar, dependsOn: jar) {
     }
 }
 
-task shieldFatEmbeddedCapsule(type: Jar, dependsOn: jar) {
-    archiveName = "quasar-stocks-shield-fat-embedded.jar"
+task shieldEmbeddedThinCapsule(type: Jar, dependsOn: jar) {
+    archiveName = "quasar-stocks-shield-embedded-thin.jar"
 
-    from jar // embed our application jar
-    from { configurations.runtime } // embed dependencies
+    from sourceSets.main.output // this way we don't need to extract
 
-    from(configurations.capsule.collect { zipTree(it) }) { include 'Capsule.class' }
-    // we just need the single Capsule class
-    from { configurations.capsuleShield.iterator().next() }
+    from { configurations.capsule.collect { zipTree(it) } } // we need all of Capsule's classes
+    from { configurations.capsuleMaven.collect { zipTree(it) } } // we need all of Capsule Maven's classes
+    from { configurations.capsuleShield.iterator().next() } // we need the Capsule Shield JAR
 
     from 'log4j.properties'
 
     manifest {
-        attributes(
+        attributes (
+            'Premain-Class'     : 'Capsule',
+            'Main-Class'        : 'Capsule',
+            'Application-Class' : mainClassName,
+            'Application-Version' : version,
+            'Extract-Capsule'   : 'false', // don't extract capsule to the filesystem
+            'Min-Java-Version'  : '1.8.0',
+            'JVM-Args'          : run.jvmArgs.join(' '),
+            'System-Properties' : run.systemProperties.collect { k,v -> "$k=$v" }.join(' '),
+            'Java-Agents'       : getDependencies(configurations.quasar).iterator().next(),
+            'Dependencies'      : getDependencies(configurations.runtime).join(' '),
+            'Repositories'      : 'central https://oss.sonatype.org/content/repositories/snapshots',
+
+            'Caplets': 'MavenCapsule co.paralleluniverse:capsule-shield:0.2.0-SNAPSHOT'
+        )
+    }
+}
+
+task shieldEmbeddedFatCapsule(type: Jar, dependsOn: jar) {
+    archiveName = "quasar-stocks-shield-embedded-fat.jar"
+
+    from jar // embed our application jar
+    from { configurations.runtime } // embed dependencies
+
+    from(configurations.capsule.collect { zipTree(it) }) { include 'Capsule.class' } // we just need the single Capsule class
+    from { configurations.capsuleShield.iterator().next() } // we need the Capsule Shield JAR
+
+    from 'log4j.properties'
+
+    manifest {
+        attributes (
             'Premain-Class': 'Capsule',
             'Main-Class': 'Capsule',
             'Application-Class': mainClassName,
@@ -267,8 +296,8 @@ task shieldFatEmbeddedCapsule(type: Jar, dependsOn: jar) {
 }
 
 applicationDefaultJvmArgs = [
-	"-javaagent:${configurations.quasar.singleFile}",
-	"-Dco.paralleluniverse.fibers.verifyInstrumentation=true"
+    "-javaagent:${configurations.quasar.singleFile}",
+    "-Dco.paralleluniverse.fibers.verifyInstrumentation=true"
 ]
 
 defaultTasks 'capsule'

@@ -1,6 +1,8 @@
 package quasarstocks;
 
 import co.paralleluniverse.embedded.containers.AbstractEmbeddedServer;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.eclipse.jetty.jmx.MBeanContainer;
 import org.eclipse.jetty.server.Server;
 import org.eclipse.jetty.server.ServerConnector;
@@ -9,15 +11,13 @@ import org.eclipse.jetty.servlet.ServletHolder;
 import org.eclipse.jetty.util.log.Log;
 import org.eclipse.jetty.util.thread.QueuedThreadPool;
 import org.eclipse.jetty.websocket.jsr356.server.deploy.WebSocketServerContainerInitializer;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import javax.servlet.Servlet;
 import javax.servlet.ServletContextListener;
 import java.lang.management.ManagementFactory;
 
 public class CustomJettyServer extends AbstractEmbeddedServer {
-	private static final Logger log = LoggerFactory.getLogger(CustomJettyServer.class);
+	private static final Logger log = LogManager.getLogger(CustomJettyServer.class.getName());
 
 	private Server server;
 	private ServerConnector http;
