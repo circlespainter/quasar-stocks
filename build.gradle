@@ -135,7 +135,7 @@ task thinCapsule(type: Jar, dependsOn: classes) {
     from { configurations.capsule.collect { zipTree(it) } } // we need all of Capsule's classes
     from { configurations.capsuleMaven.collect { zipTree(it) } } // we need all of Capsule Maven's classes
 
-    from 'log4j.properties'
+    from 'log4j2.xml'
 
     manifest {
         attributes (
@@ -164,7 +164,7 @@ task fatCapsule(type: Jar, dependsOn: jar) {
 
     from(configurations.capsule.collect { zipTree(it) }) { include 'Capsule.class' } // we just need the single Capsule class
 
-    from 'log4j.properties'
+    from 'log4j2.xml'
 
     manifest {
         attributes (
@@ -188,7 +188,7 @@ task shieldExplodedThinCapsule(type: Jar, dependsOn: classes) {
     from { configurations.capsuleMaven.collect { zipTree(it) } } // we need all of Capsule's classes
     from { configurations.capsuleShield.collect { zipTree(it) } } // we need all of Capsule Shield's classes
 
-    from 'log4j.properties'
+    from 'log4j2.xml'
 
     manifest {
         attributes (
@@ -217,7 +217,7 @@ task shieldExplodedFatCapsule(type: Jar, dependsOn: jar) {
     from(configurations.capsule.collect { zipTree(it) }) { include 'Capsule.class' } // we just need the single Capsule class
     from { configurations.capsuleShield.collect { zipTree(it) } } // we need all of Capsule Shield's classes
 
-    from 'log4j.properties'
+    from 'log4j2.xml'
 
     manifest {
         attributes (
@@ -243,7 +243,7 @@ task shieldEmbeddedThinCapsule(type: Jar, dependsOn: jar) {
     from { configurations.capsuleMaven.collect { zipTree(it) } } // we need all of Capsule Maven's classes
     from { configurations.capsuleShield.iterator().next() } // we need the Capsule Shield JAR
 
-    from 'log4j.properties'
+    from 'log4j2.xml'
 
     manifest {
         attributes (
@@ -273,7 +273,7 @@ task shieldEmbeddedFatCapsule(type: Jar, dependsOn: jar) {
     from(configurations.capsule.collect { zipTree(it) }) { include 'Capsule.class' } // we just need the single Capsule class
     from { configurations.capsuleShield.iterator().next() } // we need the Capsule Shield JAR
 
-    from 'log4j.properties'
+    from 'log4j2.xml'
 
     manifest {
         attributes (
