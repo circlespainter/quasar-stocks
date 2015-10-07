@@ -1,6 +1,11 @@
 package quasarstocks;
 
 import java.io.IOException;
+import java.net.InetAddress;
+import java.net.UnknownHostException;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
 import co.paralleluniverse.actors.*;
 import co.paralleluniverse.comsat.webactors.*;
 import co.paralleluniverse.fibers.SuspendExecution;
@@ -12,6 +17,9 @@ import static quasarstocks.StockCmds.*;
 
 @WebActor(httpUrlPatterns = {"/ws/*"}, webSocketUrlPatterns = {"/ws"})
 public class UserActor extends BasicActor<Object, Void> {
+    static final String LOOKUP_URL_REGEX_STR = "(.*)/resolve/(\\w+)";
+    static final Pattern LOOKUP_URL_REGEX = Pattern.compile(LOOKUP_URL_REGEX_STR);
+
     // The client representation of this actor
     private SendPort<WebDataMessage> peer;
 
@@ -20,7 +28,17 @@ public class UserActor extends BasicActor<Object, Void> {
             final Object message = receive();
             if (message instanceof HttpRequest) {
                 final HttpRequest msg = (HttpRequest) message;
-                msg.getFrom().send(ok(self(), msg, "httpResponse").setContentType("text/html").build());
+                final Matcher m = LOOKUP_URL_REGEX.matcher(msg.getRequestURL());
+                if (m.matches())
+                    try {
+                        final String hostname = m.group(2);
+                        final InetAddress inetAddr = InetAddress.getByName(hostname);
+                        msg.getFrom().send(ok(self(), msg, inetAddr.getHostAddress() + ": " + inetAddr.isReachable(10000)).setContentType("text/plain").build());
+                    } catch (IOException e) {
+                        throw new RuntimeException(e);
+                    }
+                else
+                    msg.getFrom().send(ok(self(), msg, "httpResponse").setContentType("text/html").build());
             } else if (message instanceof WebStreamOpened) {
                 // -------- WebSocket/SSE opened --------
                 final WebStreamOpened msg = (WebStreamOpened) message;
