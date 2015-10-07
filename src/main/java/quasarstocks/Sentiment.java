@@ -7,8 +7,10 @@ import java.io.IOException;
 import java.util.*;
 import java.util.concurrent.ExecutionException;
 import co.paralleluniverse.fibers.Fiber;
+import co.paralleluniverse.fibers.SuspendExecution;
 import co.paralleluniverse.fibers.Suspendable;
 import co.paralleluniverse.fibers.httpclient.FiberHttpClientBuilder;
+import co.paralleluniverse.strands.CheckedSuspendableCallable;
 import co.paralleluniverse.strands.SuspendableUtils;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
@@ -72,12 +74,15 @@ public class Sentiment {
     }
 
     private Fiber<JsonNode> sentimentRetriever(final String text) throws IOException {
-        return new Fiber<> (SuspendableUtils.asSuspendableCallable (() -> {
-            final HttpPost req = new HttpPost(Application.Conf.sentimentUrl);
-            final List<NameValuePair> urlParameters = new ArrayList<>();
-            urlParameters.add(new BasicNameValuePair("text", text));
-            req.setEntity(new UrlEncodedFormEntity(urlParameters));
-            return Application.Conf.mapper.readTree(EntityUtils.toString(client.execute(req).getEntity()));
+        return new Fiber<> (SuspendableUtils.asSuspendableCallable (new CheckedSuspendableCallable<JsonNode, Exception>() {
+            @Override
+            public JsonNode call() throws SuspendExecution, InterruptedException, Exception {
+                final HttpPost req = new HttpPost(Application.Conf.sentimentUrl);
+                final List<NameValuePair> urlParameters = new ArrayList<>();
+                urlParameters.add(new BasicNameValuePair("text", text));
+                req.setEntity(new UrlEncodedFormEntity(urlParameters));
+                return Application.Conf.mapper.readTree(EntityUtils.toString(client.execute(req).getEntity()));
+            }
         })).start();
     }
 

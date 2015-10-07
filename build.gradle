@@ -8,9 +8,9 @@ version             = '0.1.0-SNAPSHOT'
 status              = 'integration'
 description         = 'Quasar WebActors StockActors'
 
-ext.classifier      = ':jdk8' // ''
-sourceCompatibility = 1.8     // 1.7
-targetCompatibility = 1.8     // 1.7
+ext.classifier      = ':' // ':jdk8'
+sourceCompatibility = 1.7     // 1.8
+targetCompatibility = 1.7     // 1.8
 
 ext.slf4jVer        = '1.7.12'
 ext.log4jVer        = '1.2.17'
@@ -119,7 +119,7 @@ dependencies {
 
 def getDependencies(config) {
 	return config.getAllDependencies().collect {
-		def res = it.group + ':' + it.name + ':' + it.version + (!it.artifacts.isEmpty() ? ':' + it.artifacts.iterator().next().classifier : '')
+		def res = it.group + ':' + it.name + ':' + it.version
 		if(!it.excludeRules.isEmpty()) {
 			res += "(" + it.excludeRules.collect { it.group + ':' + it.module }.join(',') + ")"
 		}
@@ -144,7 +144,6 @@ task thinCapsule(type: Jar, dependsOn: classes) {
             'Application-Class' : mainClassName,
             'Application-Version' : version,
             'Extract-Capsule'   : 'false', // don't extract capsule to the filesystem
-            'Min-Java-Version'  : '1.8.0',
             'JVM-Args'          : run.jvmArgs.join(' '),
             'System-Properties' : run.systemProperties.collect { k,v -> "$k=$v" }.join(' '),
             'Java-Agents'       : getDependencies(configurations.quasar).iterator().next(),
@@ -173,7 +172,6 @@ task fatCapsule(type: Jar, dependsOn: jar) {
             'Main-Class'        : 'Capsule',
             'Application-Class' : mainClassName,
             'Application-Version' : version,
-            'Min-Java-Version'  : '1.8.0',
             'JVM-Args'          : run.jvmArgs.join(' '),
             'System-Properties' : run.systemProperties.collect { k,v -> "$k=$v" }.join(' '),
             'Java-Agents'       : getDependencies(configurations.quasar).iterator().next(),
@@ -199,7 +197,6 @@ task shieldExplodedThinCapsule(type: Jar, dependsOn: classes) {
             'Application-Class' : mainClassName,
             'Application-Version' : version,
             'Extract-Capsule'   : 'false', // don't extract capsule to the filesystem
-            'Min-Java-Version'  : '1.8.0',
             'JVM-Args'          : run.jvmArgs.join(' '),
             'System-Properties' : run.systemProperties.collect { k,v -> "$k=$v" }.join(' '),
             'Java-Agents'       : getDependencies(configurations.quasar).iterator().next(),
@@ -228,7 +225,6 @@ task shieldExplodedFatCapsule(type: Jar, dependsOn: jar) {
             'Main-Class': 'Capsule',
             'Application-Class': mainClassName,
             'Application-Version': version,
-            'Min-Java-Version': '1.8.0',
             'JVM-Args': run.jvmArgs.join(' '),
             'System-Properties': run.systemProperties.collect { k, v -> "$k=$v" }.join(' '),
             'Java-Agents': getDependencies(configurations.quasar).iterator().next(),
@@ -256,12 +252,12 @@ task shieldEmbeddedThinCapsule(type: Jar, dependsOn: jar) {
             'Application-Class' : mainClassName,
             'Application-Version' : version,
             'Extract-Capsule'   : 'false', // don't extract capsule to the filesystem
-            'Min-Java-Version'  : '1.8.0',
             'JVM-Args'          : run.jvmArgs.join(' '),
             'System-Properties' : run.systemProperties.collect { k,v -> "$k=$v" }.join(' '),
             'Java-Agents'       : getDependencies(configurations.quasar).iterator().next(),
             'Dependencies'      : getDependencies(configurations.runtime).join(' '),
             'Repositories'      : 'central https://oss.sonatype.org/content/repositories/snapshots',
+            'Java-Version'  : '1.7.0',
 
             'Caplets': 'MavenCapsule co.paralleluniverse:capsule-shield:0.2.0-SNAPSHOT'
         )
@@ -285,7 +281,6 @@ task shieldEmbeddedFatCapsule(type: Jar, dependsOn: jar) {
             'Main-Class': 'Capsule',
             'Application-Class': mainClassName,
             'Application-Version': version,
-            'Min-Java-Version': '1.8.0',
             'JVM-Args': run.jvmArgs.join(' '),
             'System-Properties': run.systemProperties.collect { k, v -> "$k=$v" }.join(' '),
             'Java-Agents': getDependencies(configurations.quasar).iterator().next(),

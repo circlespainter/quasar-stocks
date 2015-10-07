@@ -17,7 +17,12 @@ public final class StockActors {
         private static final Supervisor.ChildSpec spec(final String sym) {
             return new Supervisor.ChildSpec (
                 sym, Supervisor.ChildMode.TRANSIENT, 3, 10, TimeUnit.MILLISECONDS, 10,
-                (ActorBuilder<Object, Void>) () -> new StockActor(sym)
+                (new ActorBuilder<Object, Void>() {
+                    @Override
+                    public Actor<Object, Void> build() throws SuspendExecution {
+                        return new StockActor(sym);
+                    }
+                })
             );
         }
 
