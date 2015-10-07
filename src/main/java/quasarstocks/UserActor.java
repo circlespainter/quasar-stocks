@@ -17,7 +17,7 @@ import static quasarstocks.StockCmds.*;
 
 @WebActor(httpUrlPatterns = {"/ws/*"}, webSocketUrlPatterns = {"/ws"})
 public class UserActor extends BasicActor<Object, Void> {
-    static final String LOOKUP_URL_REGEX_STR = "(.*)/resolve/(\\w+)";
+    static final String LOOKUP_URL_REGEX_STR = "(.*)/resolve/([\\.\\-a-zA-Z0-9_]+)";
     static final Pattern LOOKUP_URL_REGEX = Pattern.compile(LOOKUP_URL_REGEX_STR);
 
     // The client representation of this actor
