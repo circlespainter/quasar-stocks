@@ -12,18 +12,17 @@ ext.classifier      = ':' // ':jdk8'
 sourceCompatibility = 1.7     // 1.8
 targetCompatibility = 1.7     // 1.8
 
-ext.slf4jVer        = '1.7.12'
+ext.slf4jVer        = '1.7.13'
 ext.log4jVer        = '1.2.17'
 ext.servletVer      = '3.0.1'
-ext.comsatVer       = '0.5.0'
-ext.quasarVer       = '0.7.3'
-ext.jacksonVer      = '2.5.4'
+ext.comsatVer       = '0.6.0-SNAPSHOT'
+ext.quasarVer       = '0.7.4-SNAPSHOT'
+ext.jacksonVer      = '2.6.3'
 ext.junitVer        = '4.12'
 ext.asmVer          = '5.0.4'
-ext.jerseyVer       = '2.18'
-ext.httpClientVer   = '4.5'
-ext.httpCoreVer     = '4.4.1'
-ext.jerseyVer       = '2.19'
+ext.httpClientVer   = '4.5.1'
+ext.httpCoreVer     = '4.4.3'
+ext.jerseyVer       = '2.22.1'
 
 ext.capsuleVersion  = '1.0.2-SNAPSHOT'
 ext.capsuleMavenVersion  = '1.0'
@@ -49,6 +48,8 @@ configurations.all {
     resolutionStrategy {
         failOnVersionConflict()
 
+        force "co.paralleluniverse:quasar-core:$quasarVer"
+        force "co.paralleluniverse:quasar-actors:$quasarVer"
         force "com.fasterxml.jackson.core:jackson-core:$jacksonVer"
         force "com.fasterxml.jackson.core:jackson-databind:$jacksonVer"
         force "com.fasterxml.jackson.core:jackson-annotations:$jacksonVer"
@@ -98,7 +99,7 @@ dependencies {
     compile "co.paralleluniverse:comsat-actors-servlet:$comsatVer"
     compile "co.paralleluniverse:comsat-test-utils:$comsatVer"
 
-    compile "org.eclipse.jetty:jetty-jmx:9.2.13.v20150730"
+    compile "org.eclipse.jetty:jetty-jmx:9.2.14.v20151106"
 
     compile 'org.apache.logging.log4j:log4j-api:2.4'
 
@@ -154,6 +155,7 @@ task thinCapsule(type: Jar, dependsOn: classes) {
             'Java-Agents'       : getDependencies(configurations.quasar).iterator().next(),
             'Dependencies'      : getDependencies(configurations.runtime).join(' '),
             'Repositories'      : 'central https://oss.sonatype.org/content/repositories/snapshots',
+            'Allow-Snapshots'   : 'true',
 
             'Caplets'           : 'MavenCapsule'
         )
