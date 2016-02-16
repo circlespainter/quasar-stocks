@@ -16,17 +16,18 @@ ext.slf4jVer        = '1.7.13'
 ext.log4jVer        = '1.2.17'
 ext.servletVer      = '3.0.1'
 ext.comsatVer       = '0.6.0-SNAPSHOT'
-ext.quasarVer       = '0.7.4-SNAPSHOT'
+ext.quasarVer       = '0.7.4'
 ext.jacksonVer      = '2.6.3'
 ext.junitVer        = '4.12'
 ext.asmVer          = '5.0.4'
 ext.httpClientVer   = '4.5.1'
 ext.httpCoreVer     = '4.4.3'
 ext.jerseyVer       = '2.22.1'
+ext.guavaVer        = '19.0'
 
 ext.capsuleVersion  = '1.0.2-SNAPSHOT'
 ext.capsuleMavenVersion  = '1.0'
-ext.capsuleShieldVersion  = '0.2.0-SNAPSHOT'
+ext.capsuleDaemonVersion  = '0.2.0-SNAPSHOT'
 
 [compileJava, compileTestJava]*.options*.encoding = 'UTF-8'
 
@@ -35,7 +36,7 @@ configurations {
     provided
     capsule
     capsuleMaven
-    capsuleShield
+    capsuleDaemon
 }
 
 sourceSets {
@@ -60,6 +61,7 @@ configurations.all {
         force "org.apache.httpcomponents:httpcore:$httpCoreVer"
         force "org.slf4j:slf4j-api:$slf4jVer"
         force "org.ow2.asm:asm:$asmVer"
+        force "com.google.guava:guava:$guavaVer"
     }
 }
 
@@ -109,13 +111,13 @@ dependencies {
 
     capsule "co.paralleluniverse:capsule:$capsuleVersion"
     capsuleMaven "co.paralleluniverse:capsule-maven:$capsuleMavenVersion"
-    capsuleShield "co.paralleluniverse:capsule-shield:$capsuleShieldVersion"
+    capsuleDaemon "co.paralleluniverse:capsule-daemon:$capsuleDaemonVersion"
 
     quasar "co.paralleluniverse:quasar-core:${quasarVer}${classifier}@jar"
 
     runtime 'org.apache.logging.log4j:log4j-core:2.4'
 
-	testCompile "junit:junit:$junitVer"
+    testCompile "junit:junit:$junitVer"
 }
 
 def getDependencies(config) {
@@ -186,14 +188,14 @@ task fatCapsule(type: Jar, dependsOn: jar) {
     }
 }
 
-task shieldExplodedThinCapsule(type: Jar, dependsOn: classes) {
-    archiveName = "quasar-stocks-shield-exploded-thin.jar"
+task daemonExplodedThinCapsule(type: Jar, dependsOn: classes) {
+    archiveName = "quasar-stocks-daemon-exploded-thin.jar"
 
     from sourceSets.main.output // this way we don't need to extract
 
     from { configurations.capsule.collect { zipTree(it) } } // we need all of Capsule's classes
     from { configurations.capsuleMaven.collect { zipTree(it) } } // we need all of Capsule's classes
-    from { configurations.capsuleShield.collect { zipTree(it) } } // we need all of Capsule Shield's classes
+    from { configurations.capsuleDaemon.collect { zipTree(it) } } // we need all of Capsule Shield's classes
 
     from 'log4j2.xml'
 
@@ -210,19 +212,19 @@ task shieldExplodedThinCapsule(type: Jar, dependsOn: classes) {
             'Dependencies'      : getDependencies(configurations.runtime).join(' '),
             'Repositories'      : 'central https://oss.sonatype.org/content/repositories/snapshots',
 
-            'Caplets'           : 'MavenCapsule ShieldedCapsule'
+            'Caplets'           : 'MavenCapsule DaemonCapsule'
         )
     }
 }
 
-task shieldExplodedFatCapsule(type: Jar, dependsOn: jar) {
-    archiveName = "quasar-stocks-shield-exploded-fat.jar"
+task daemonExplodedFatCapsule(type: Jar, dependsOn: jar) {
+    archiveName = "quasar-stocks-daemon-exploded-fat.jar"
 
     from jar // embed our application jar
     from { configurations.runtime } // embed dependencies
 
     from(configurations.capsule.collect { zipTree(it) }) { include 'Capsule.class' } // we just need the single Capsule class
-    from { configurations.capsuleShield.collect { zipTree(it) } } // we need all of Capsule Shield's classes
+    from { configurations.capsuleDaemon.collect { zipTree(it) } } // we need all of Capsule Shield's classes
 
     from 'log4j2.xml'
 
@@ -236,19 +238,19 @@ task shieldExplodedFatCapsule(type: Jar, dependsOn: jar) {
             'System-Properties': run.systemProperties.collect { k, v -> "$k=$v" }.join(' '),
             'Java-Agents': getDependencies(configurations.quasar).iterator().next(),
 
-            'Caplets': 'ShieldedCapsule'
+            'Caplets': 'DaemonCapsule'
         )
     }
 }
 
-task shieldEmbeddedThinCapsule(type: Jar, dependsOn: jar) {
-    archiveName = "quasar-stocks-shield-embedded-thin.jar"
+task daemonEmbeddedThinCapsule(type: Jar, dependsOn: jar) {
+    archiveName = "quasar-stocks-daemon-embedded-thin.jar"
 
     from sourceSets.main.output // this way we don't need to extract
 
     from { configurations.capsule.collect { zipTree(it) } } // we need all of Capsule's classes
     from { configurations.capsuleMaven.collect { zipTree(it) } } // we need all of Capsule Maven's classes
-    from { configurations.capsuleShield.iterator().next() } // we need the Capsule Shield JAR
+    from { configurations.capsuleDaemon.iterator().next() } // we need the Capsule Shield JAR
 
     from 'log4j2.xml'
 
@@ -266,19 +268,19 @@ task shieldEmbeddedThinCapsule(type: Jar, dependsOn: jar) {
             'Repositories'      : 'central https://oss.sonatype.org/content/repositories/snapshots',
             'Java-Version'  : '1.7.0',
 
-            'Caplets': 'MavenCapsule co.paralleluniverse:capsule-shield:0.2.0-SNAPSHOT'
+            'Caplets': 'MavenCapsule co.paralleluniverse:capsule-daemon:0.2.0-SNAPSHOT'
         )
     }
 }
 
-task shieldEmbeddedFatCapsule(type: Jar, dependsOn: jar) {
-    archiveName = "quasar-stocks-shield-embedded-fat.jar"
+task daemonEmbeddedFatCapsule(type: Jar, dependsOn: jar) {
+    archiveName = "quasar-stocks-daemon-embedded-fat.jar"
 
     from jar // embed our application jar
     from { configurations.runtime } // embed dependencies
 
     from(configurations.capsule.collect { zipTree(it) }) { include 'Capsule.class' } // we just need the single Capsule class
-    from { configurations.capsuleShield.iterator().next() } // we need the Capsule Shield JAR
+    from { configurations.capsuleDaemon.iterator().next() } // we need the Capsule Shield JAR
 
     from 'log4j2.xml'
 
@@ -292,7 +294,7 @@ task shieldEmbeddedFatCapsule(type: Jar, dependsOn: jar) {
             'System-Properties': run.systemProperties.collect { k, v -> "$k=$v" }.join(' '),
             'Java-Agents': getDependencies(configurations.quasar).iterator().next(),
 
-            'Caplets': 'co.paralleluniverse:capsule-shield:0.2.0-SNAPSHOT'
+            'Caplets': 'co.paralleluniverse:capsule-daemon:0.2.0-SNAPSHOT'
         )
     }
 }
