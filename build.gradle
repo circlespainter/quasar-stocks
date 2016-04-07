@@ -12,21 +12,21 @@ ext.classifier      = ':' // ':jdk8'
 sourceCompatibility = 1.7     // 1.8
 targetCompatibility = 1.7     // 1.8
 
-ext.slf4jVer        = '1.7.13'
+ext.slf4jVer        = '1.7.21'
 ext.log4jVer        = '1.2.17'
 ext.servletVer      = '3.0.1'
-ext.comsatVer       = '0.6.0-SNAPSHOT'
+ext.comsatVer       = '0.7.0'
 ext.quasarVer       = '0.7.4'
-ext.jacksonVer      = '2.6.3'
+ext.jacksonVer      = '2.7.0'
 ext.junitVer        = '4.12'
 ext.asmVer          = '5.0.4'
 ext.httpClientVer   = '4.5.1'
-ext.httpCoreVer     = '4.4.3'
-ext.jerseyVer       = '2.22.1'
+ext.httpCoreVer     = '4.4.4'
+ext.jerseyVer       = '2.22.2'
 ext.guavaVer        = '19.0'
 
 ext.capsuleVersion  = '1.0.2-SNAPSHOT'
-ext.capsuleMavenVersion  = '1.0'
+ext.capsuleMavenVersion  = '1.0.2-SNAPSHOT'
 ext.capsuleDaemonVersion  = '0.2.0-SNAPSHOT'
 
 [compileJava, compileTestJava]*.options*.encoding = 'UTF-8'
